@@ -5,9 +5,9 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from transformers import AutoModel
 
 
-class LayerNormalization(nn.Module):
+class ConditionalLayerNormalization(nn.Module):
     def __init__(self, input_dim, cond_dim=0, center=True, scale=True, epsilon=None, conditional=False, hidden_units=None, hidden_activation='linear', hidden_initializer='xaiver', **kwargs):
-        super(LayerNormalization, self).__init__()
+        super(ConditionalLayerNormalization, self).__init__()
         self.center = center
         self.scale = scale
         self.conditional = conditional
@@ -189,7 +189,7 @@ class W2NERmodel(nn.Module):
                                      config.conv_hid_size * len(config.dilation), config.ffnn_hid_size,
                                      config.out_dropout)
 
-        self.cln = LayerNormalization(config.lstm_hid_size, config.lstm_hid_size, conditional=True)
+        self.cln = ConditionalLayerNormalization(config.lstm_hid_size, config.lstm_hid_size, conditional=True)
 
     def forward(self, bert_inputs, grid_mask2d, dist_inputs, pieces2word, sent_length):
         bert_embs = self.bert(input_ids=bert_inputs, attention_mask=bert_inputs.ne(0).float())
